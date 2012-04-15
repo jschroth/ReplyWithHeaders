@@ -21,7 +21,7 @@
 		4D5FF1B412725AE500A945C5 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
-			dstPath = /Users/yanger/Library/Mail/Bundles;
+			dstPath = "~/Desktop";
 			dstSubfolderSpec = 0;
 			files = (
 				4D5FF1BC12725B2900A945C5 /* ReplyWithHeader.mailbundle in CopyFiles */,

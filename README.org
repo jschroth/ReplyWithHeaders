@@ -1,21 +1,21 @@
 * NEWS
-Sun Mar 27 14:08:21 PDT 2011
-- Updated for Mail and Message 4.5
-- Version is 1.1.5
-
-Sun Nov 28 10:59:29 PST 2010:
-- Updated the bundle for the latest Message and Mail framework UUIDs.
-- Version is 1.1.4
+Sun Apr 15 13:15:50 PDT 2012
+- Forked code from Saptarshi Guha to organize the code better
+- Updated version number style 
+  - 1.x will be for Snow Leopard and 2.x will be for Lion
+- Separated Code for Snow Leopard and Lion
+- Snow Leopard Code updated with fixes/enhancements previously done for Lion
+  - Include header in quoted text
+  - Fixed problems that could cause the reply message to fail for certain emails
+- Updated headers to appear with correct spacing when received by Entourage 2004
+  - probably fixes how the headers appeared in other old email clients too
 
 * About
-The reply in Mail.app creates a new email with the preamble
+The default reply header (attribution) in Mail.app creates a new email with the preamble
+ "On 21 July 2010, John Doe wrote:."
 
-On 21 July 2010, John Doe wrote:
-
-....
-
-
-When forward, the first few lines is the 
+On the other if one forwards a message in Mail.app, the header shows as a 
+list of items:
 
 From:
 Subject:
@@ -23,16 +23,28 @@ Date:
 
 etc.
 
-ReplyWithHeaders causes the reply message to behave like forwarding. I developed
-this a long time back on someones request. I don't use it much myself nor do I
-spend time developing it.  So if things break, I might not fix things quickly.
+ReplyWithHeaders replaces the default reply header with one more like the
+forwarding header. Saptarshi Guha originally developed
+this a long time ago on someone's request. Saptarshi doesn't use this much, 
+but I use it every day and try to keep it updated.  I also like to hear about
+any problems you encounter with it in order to try and make it better.  At
+somepoint I would like to create some user options so that you can
+configure parts of the message header to your liking, but at this time you
+will have to modify and compile the code on your own if you want to change
+anything.
+
+Also, please note that I have requested Apple add this feature into Mail.app
+for years and I believe I still have an open ticket on this request, but
+obviously Apple doesn't mind if we just modify it ourselves.
 
 * Requirements:
-At least
 
-Mail: Version 4.3 (1081)
+Mail: Version 4.3 (1081) or later
 
-Snow Leopard: 10.6.4
+OS: 10.6.4+ (Snow Leopard) 10.7.+ (Lion)
+
+PLEASE ENSURE YOU DOWNLOAD THE PROPER VERSION OF THE BUNDLE FOR YOUR OS AND MAIL VERSIONS
+(1.x downloads are for Snow Leopard and 2.x downloads are for Lion)
 
 * Installation
 
@@ -43,14 +55,16 @@ Snow Leopard: 10.6.4
 
    > defaults write com.apple.mail EnableBundles -bool true
 
-   > defaults write com.apple.mail BundleCompatibilityVersion 4
-4. Start Console.app (/Applications/Utilities)
-5. In the search bar (top right corner of Console.app) type: Mail
+4. Open Mail.app
+
+*Verify Installation
+
+1. Start Console.app (/Applications/Utilities)
+2. In the search bar (top right corner of Console.app) type: Mail
 
    This will restrict your information to Mail.app messages
-6. Restart Mail.app
 
-In the console, if all goes well, you should see
+In the console, if your ReplyWithHeaders bundle was loaded, you should see
 
 ReplyWithHeaders: Oh its a wonderful life
 

@@ -86,7 +86,8 @@ char *rph_sih = "setOriginalMessageWebArchive:";
 //		NSLog(@"Document=%@",document);
 		DOMDocumentFragment *border=[ [document htmlDocument]
 								 createDocumentFragmentWithMarkupString:
-								 @"<div style='border:none;border-top:solid #B5C4DF 1.0pt;padding:0 0 0 0;margin:10px 0 5px 0;'></div>"
+                                     @"-----Original Message-----"
+								 //@"<div style='border:none;border-top:solid #B5C4DF 1.0pt;padding:0 0 0 0;margin:10px 0 5px 0;'></div>"
 								 ];
 
 		BOOL boldhead=YES;
@@ -133,7 +134,12 @@ char *rph_sih = "setOriginalMessageWebArchive:";
 //	}
 	// the first one is "On .... X wrote"
 		if(dhc.length>1 && howdeep==0) {
-			[origemail removeChild:[dhc item:0]];
+            [origemail removeChild:[dhc item:0]]; 
+//            NSLog(@"Removed Original Text, only %d children left",[origemail childElementCount]);
+            if( [[[origemail firstChild] nodeName] isEqualToString:@"BR"] ) {                
+                [origemail removeChild:[origemail firstChild]];
+//            NSLog(@"Removed BR element, only %d children left",[origemail childElementCount]);
+               }
 		}
 		if(dhc.length>1 && howdeep==1) {
 			// is this signature?
@@ -153,21 +159,98 @@ char *rph_sih = "setOriginalMessageWebArchive:";
 				
 			// if signature at top, item==3 else item==1
 			[origemail removeChild:[dhc item:which]];
+            
+            //find the quoted text - if plain text (blockquote does not exist), -which- will point to br element
+            for(int i =0;i < [origemail childElementCount];i++) {
+                if( [[[[origemail childNodes] item:i] nodeName] isEqualToString:@"BLOCKQUOTE"] ) {                
+                    //this is the quoted text
+                    which=i;
+                    break;
+                    
+                }
+            }
+            
 		}
-		
-	WebArchive * headerwebarchive=[headerString webArchiveForRange:NSMakeRange(0,[headerString length]) fixUpNewlines:YES];
+    
+    //remove the color attribute so that the text is black instead of gray
+    NSMutableAttributedString *newheaderString = [headerString mutableCopy];
+    [newheaderString removeAttribute:@"NSColor" range:NSMakeRange(0,[newheaderString length])];
+    [newheaderString removeAttribute:@"NSParagraphStyle" range:NSMakeRange(0,[newheaderString length])];
+    
+
+    //NSLog(@"Sig=%@",newheaderString);
+	WebArchive * headerwebarchive=[newheaderString webArchiveForRange:NSMakeRange(0,[newheaderString length]) fixUpNewlines:YES];
+         //NSLog(@"WebArch=%@",[headerwebarchive description]);
 	DOMDocumentFragment *headerfragment=[ [document htmlDocument] createFragmentForWebArchive:headerwebarchive];
+        
+
+      //kind of silly, but this code is required so that the adulation appears correctly in Entourage 2004
+        //2004 would interpret the paragraph tag and ignore the specified style information creating large spaces
+        //between line items
+        DOMNodeList * fragnodes = [[headerfragment firstChild] childNodes];
+
+        for(int i=0; i< fragnodes.length;i++){	
+            //NSLog(@"%d=(Type %d) %@ %@ %@",i, [[fragnodes item:i] nodeType], [fragnodes item:i], [[fragnodes item:i] nodeName],[[fragnodes item:i] nodeValue]);
+            
+           if( [[[fragnodes item:i] nodeName] isEqualToString:@"P"] ) {
+               //we have a paragraph element, so now replace it with a break element
+               DOMDocumentFragment *brelem=[ [document htmlDocument]
+                                            createDocumentFragmentWithMarkupString:
+                                            @"<br />"
+                                            ];
+                   if( i == 0) {
+                       //because the paragraphs are the containers so you get two initially...
+                       brelem = [ [document htmlDocument]
+                                 createDocumentFragmentWithMarkupString:
+                                 @"<span />"
+                                 ];
+                   }
+               DOMNodeList *pnodes = [[fragnodes item:i] childNodes];
+               for(int j=0; j< pnodes.length;j++){	
+                   //copy all child nodes to the new node...
+                   [brelem appendChild:[pnodes item:j]];
+               }
+               //now replace the paragraph node...
+               [[headerfragment firstChild] replaceChild:brelem oldChild:[fragnodes item:i] ];      
+            }
+        }
+    //end entourge 2004 required code
+        
+        
+       // NSLog(@"frag=%@",[[headerfragment firstChild] ]);
+        
 	if(howdeep==0){
-			[origemail insertBefore:headerfragment refChild: [origemail firstChild] ];
-			[origemail insertBefore:border refChild: [origemail firstChild] ];
+        //depending on the options selected to increase quote level or whatever, a reply might not have a grandchild from the first child
+        //so we need to account for that... man this gets complicated... so if it is a textnode, there are no children... :(
+        //so account for that too
+        int numgrandchild = 0;
+        if( ![ [[origemail firstChild] nodeName] isEqualToString:@"#text"] ) {
+            numgrandchild = [[origemail firstChild] childElementCount];
+        }
+     
+//        NSLog(@"numgrandchildren %d=(Type %d) %@\n%@\n",numgrandchild, [[origemail firstChild] nodeType], [origemail firstChild], [[origemail firstChild] nodeName]);
+        if( numgrandchild == 0 ) {
+            [origemail insertBefore:headerfragment refChild: [origemail firstChild] ];
+            [origemail insertBefore:border refChild: [origemail firstChild] ];
+        }
+        else {
+          [[origemail firstChild] insertBefore:headerfragment refChild: [[origemail firstChild] firstChild] ];
+          [[origemail firstChild] insertBefore:border refChild: [[origemail firstChild] firstChild]];
+        }
 	}else if(howdeep==1){
-		if([dhc item:1] != NULL && which>0){
-			[origemail insertBefore:headerfragment refChild: [dhc item:which] ];
-			[origemail insertBefore:border refChild: [dhc item:which] ];
-		}
-	}
-		
-	}
+        if(which>0){
+            //check if this is plain text by seeing if -which- points to a br element... if not, include in blockquote
+            if( [[[[origemail childNodes] item:which] nodeName] isEqualToString:@"BR"] ) {
+                [origemail insertBefore:headerfragment refChild:[dhc item:which] ];
+                [origemail insertBefore:border refChild:[dhc item:which] ];
+            }
+            else {
+                [[[origemail childNodes] item:which] insertBefore:headerfragment refChild:[[[origemail childNodes] item:which] firstChild] ];
+                [[[origemail childNodes] item:which] insertBefore:border refChild:[[[origemail childNodes] item:which] firstChild] ];
+            }
+		 }
+	  }
+   }
 }
 
 
