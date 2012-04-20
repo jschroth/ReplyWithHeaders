@@ -187,10 +187,32 @@ char *rph_sih = "setOriginalMessageWebArchive:";
       //kind of silly, but this code is required so that the adulation appears correctly in Entourage 2004
         //2004 would interpret the paragraph tag and ignore the specified style information creating large spaces
         //between line items
-        DOMNodeList * fragnodes = [[headerfragment firstChild] childNodes];
+        DOMNodeList *fragnodes = [[headerfragment firstChild] childNodes];
 
         for(int i=0; i< fragnodes.length;i++){	
-            //NSLog(@"%d=(Type %d) %@ %@ %@",i, [[fragnodes item:i] nodeType], [fragnodes item:i], [[fragnodes item:i] nodeName],[[fragnodes item:i] nodeValue]);
+//            NSLog(@"%d=(Type %d) %@ %@ %@",i, [[fragnodes item:i] nodeType], [fragnodes item:i], [[fragnodes item:i] nodeName],[[fragnodes item:i] nodeValue]);
+            
+           if( [[fragnodes item:i] nodeType] == 1 ) {
+//               NSLog(@" HTML = %@",[[fragnodes item:i] outerHTML]);
+               
+               if( [[[fragnodes item:i] nodeName] isEqualToString:@"FONT"] ) {
+                   NSString *fontTag = [[fragnodes item:i] outerHTML];
+                   NSArray *tagComponents = [fontTag componentsSeparatedByString:@" "];
+                   NSString *oldSize;
+                   for( int j=0; j < tagComponents.count; j++) {
+                       NSString *testString = [[tagComponents objectAtIndex:j] commonPrefixWithString:@"size" options:NSCaseInsensitiveSearch];
+                       if( [testString isEqualToString:@"size"] ) {
+                           oldSize = [tagComponents objectAtIndex:j];
+//                           NSLog(@" sizeString = %@",oldSize);
+                       }
+                   }
+                   oldSize = [@" " stringByAppendingString:oldSize];
+//                   NSLog(@" newsizetext = %@",fontTag);
+                   NSString *newTag = [fontTag stringByReplacingOccurrencesOfString:oldSize withString:@""];
+//                   NSLog(@" newString = %@",newTag);
+                   [[fragnodes item:i] setOuterHTML:newTag];
+               }
+           }
             
            if( [[[fragnodes item:i] nodeName] isEqualToString:@"P"] ) {
                //we have a paragraph element, so now replace it with a break element
