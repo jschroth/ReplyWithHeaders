@@ -1,4 +1,7 @@
 * NEWS
+Thursday Aug 02
+- Created Branch for Lion since there appears to be some minor code differences
+
 Thursday Oct 13
 - Info.plist updated by Json Schroth for 10.7.2
 - version 1.1.7
