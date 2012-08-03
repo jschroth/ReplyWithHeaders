@@ -100,7 +100,7 @@ char *rph_sih = "setOriginalMessageWebArchive:";
 		int howdeep = 0; //AppleOriginalContents=0 ApplePlainTextBody=1
 		if([origemail firstChild]==NULL){
 			origemail=[[[document htmlDocument] descendantsWithClassName:@"ApplePlainTextBody"] objectAtIndex:0]; 
-//			NSLog(@"Orig is now %@", origemail);
+			NSLog(@"Orig is now %@", origemail);
 			howdeep=1;
 //			DOMNodeList *vl = [origemail childNodes];
 //			for(int i=0;i< vl.length;i++){
