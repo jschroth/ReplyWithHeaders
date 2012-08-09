@@ -270,6 +270,7 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = ReplyWithHeader;
+				SDKROOT = macosx10.7;
 				STRIP_STYLE = "non-global";
 				WRAPPER_EXTENSION = mailbundle;
 				ZERO_LINK = YES;
@@ -294,6 +295,7 @@
 					dynamic_lookup,
 				);
 				PRODUCT_NAME = ReplyWithHeader;
+				SDKROOT = macosx10.7;
 				STRIP_STYLE = "non-global";
 				WRAPPER_EXTENSION = mailbundle;
 			};
