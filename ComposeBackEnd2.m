@@ -151,22 +151,23 @@ char *rph_sih = "setOriginalMessageWebArchive:";
 									//	includeBCC:YES];
         
 	DOMNodeList *dhc = [origemail childNodes];
-	//NSUserDefaults *nsd=	[NSUserDefaults standardUserDefaults];
-	//BOOL signatureattop = [nsd boolForKey:@"SignaturePlacedAboveQuotedText"];	
-//    NSLog(@"howdeep = %d", howdeep);
-//	for(int i=0; i< dhc.length;i++){	
-//		NSLog(@"%d=(Type %d) %@\n%@\n",i, [[dhc item:i] nodeType], [dhc item:i], [[dhc item:i] nodeName]);
-//	}
-	// the first one is "On .... X wrote"
-		if(dhc.length>1 && howdeep==0) {
-			[origemail removeChild:[dhc item:0]]; 
-//            NSLog(@"Removed Original Text, only %d children left",[origemail childElementCount]);
-            if( [[[origemail firstChild] nodeName] isEqualToString:@"BR"] ) {                
-                [origemail removeChild:[origemail firstChild]];
-//                NSLog(@"Removed BR element, only %d children left",[origemail childElementCount]);
-            }
-		}
-		if(dhc.length>1 && howdeep==1) {
+    //NSUserDefaults *nsd=	[NSUserDefaults standardUserDefaults];
+    //BOOL signatureattop = [nsd boolForKey:@"SignaturePlacedAboveQuotedText"];
+    //    NSLog(@"howdeep = %d", howdeep);
+//    for(int i=0; i< dhc.length;i++){
+//		NSLog(@"%d=(Type %d) %@ %@\n%@\n",i, [[dhc item:i] nodeType], [dhc item:i], [[dhc item:i] nodeName],[[dhc item:i] stringValue]);
+//        }
+        // the first one is "On .... X wrote"
+	if(dhc.length>1 && howdeep==0) {
+           
+        [origemail removeChild:[dhc item:0]];
+        //NSLog(@"Removed Original Text, only %d children left",[origemail childElementCount]);
+        if( [[[origemail firstChild] nodeName] isEqualToString:@"BR"] ) {
+            [origemail removeChild:[origemail firstChild]];
+            //NSLog(@"Removed BR element, only %d children left",[origemail childElementCount]);
+        }
+    }
+    if(dhc.length>1 && howdeep==1) {
 			// is this signature?
 //			NSLog(@"Sig=%@ %d<%@>",[dhc item:0],[[dhc item:0] nodeType],[[dhc item:0] stringValue]);
 //			NSLog(@"Sig=%@ %d<%@>",[dhc item:1],[[dhc item:1] nodeType],[[dhc item:1] stringValue]);
