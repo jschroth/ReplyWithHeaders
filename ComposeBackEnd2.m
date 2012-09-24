@@ -210,6 +210,61 @@ char *rph_sih = "setOriginalMessageWebArchive:";
     
 	WebArchive * headerwebarchive=[newheaderString webArchiveForRange:NSMakeRange(0,[newheaderString length]) fixUpNewlines:YES];
 	DOMDocumentFragment *headerfragment=[ [document htmlDocument] createFragmentForWebArchive:headerwebarchive];
+        
+        //kind of silly, but this code is required so that the adulation appears correctly in Entourage 2004
+        //2004 would interpret the paragraph tag and ignore the specified style information creating large spaces
+        //between line items
+        DOMNodeList *fragnodes = [[headerfragment firstChild] childNodes];
+        
+        for(int i=0; i< fragnodes.length;i++){
+            //            NSLog(@"%d=(Type %d) %@ %@ %@",i, [[fragnodes item:i] nodeType], [fragnodes item:i], [[fragnodes item:i] nodeName],[[fragnodes item:i] nodeValue]);
+            
+            if( [[fragnodes item:i] nodeType] == 1 ) {
+                //               NSLog(@" HTML = %@",[[fragnodes item:i] outerHTML]);
+                
+                if( [[[fragnodes item:i] nodeName] isEqualToString:@"FONT"] ) {
+                    NSString *fontTag = [[fragnodes item:i] outerHTML];
+                    NSArray *tagComponents = [fontTag componentsSeparatedByString:@" "];
+                    NSString *oldSize;
+                    for( int j=0; j < tagComponents.count; j++) {
+                        NSString *testString = [[tagComponents objectAtIndex:j] commonPrefixWithString:@"size" options:NSCaseInsensitiveSearch];
+                        if( [testString isEqualToString:@"size"] ) {
+                            oldSize = [tagComponents objectAtIndex:j];
+                            //                           NSLog(@" sizeString = %@",oldSize);
+                        }
+                    }
+                    oldSize = [@" " stringByAppendingString:oldSize];
+                    //                   NSLog(@" newsizetext = %@",fontTag);
+                    NSString *newTag = [fontTag stringByReplacingOccurrencesOfString:oldSize withString:@""];
+                    //                   NSLog(@" newString = %@",newTag);
+                    [[fragnodes item:i] setOuterHTML:newTag];
+                }
+            }
+            
+            if( [[[fragnodes item:i] nodeName] isEqualToString:@"P"] ) {
+                //we have a paragraph element, so now replace it with a break element
+                DOMDocumentFragment *brelem=[ [document htmlDocument]
+                                             createDocumentFragmentWithMarkupString:
+                                             @"<br />"
+                                             ];
+                if( i == 0) {
+                    //because the paragraphs are the containers so you get two initially...
+                    brelem = [ [document htmlDocument]
+                              createDocumentFragmentWithMarkupString:
+                              @"<span />"
+                              ];
+                }
+                DOMNodeList *pnodes = [[fragnodes item:i] childNodes];
+                for(int j=0; j< pnodes.length;j++){
+                    //copy all child nodes to the new node...
+                    [brelem appendChild:[pnodes item:j]];
+                }
+                //now replace the paragraph node...
+                [[headerfragment firstChild] replaceChild:brelem oldChild:[fragnodes item:i] ];
+            }
+        }
+        //end entourge 2004 required code
+        
 	if(howdeep==0){
          //depending on the options selected to increase quote level or whatever, a reply might not have a grandchild from the first child
         //so we need to account for that... man this gets complicated... so if it is a textnode, there are no children... :(
