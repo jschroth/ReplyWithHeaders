@@ -1,4 +1,9 @@
 * NEWS
+Tuesday 17-Sep-2013
+- Jeeva M. has expressed interest in maintaining this bundle going forward at https://github.com/jeevatkm/ReplyWithHeaders.
+- Jeeva will post the link to the latest build in that repo's Readme.
+- I'm very happy to see someone else stepping in to help maintain what Saptarshi started.
+
 Wednesday 10-Jul-2013
 - Changed license terms to MIT license with agreement from Saptarshi Guha
 - Due to unforeseen circumstances, I am no longer able to support this software. I hope someone else will be able to continue supporting it going forward.
