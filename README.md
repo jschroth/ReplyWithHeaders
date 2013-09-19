@@ -2,7 +2,7 @@ PLEASE READ
 -----------
 Jeevanandam M. has taken over this project, please go here [https://github.com/jeevatkm/ReplyWithHeaders][1].
 
-To know more about RWH and Upcoming releases, refer [Milestones][2] and README.
+To know more about **RWH** and **Upcoming Releases**, refer [Milestones][2] and [README][1].
 
 NEWS
 ----
